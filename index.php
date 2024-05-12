@@ -100,7 +100,8 @@
                 }).done(function (response, status, xhr) {
                     $(".loader-container").hide();
                     let r = JSON.parse(response);
-                    getcsvdetails(r.filename,6,r.count);
+                    getcsvdetails(r.filename,6,r.count,0,0,0,0,0);
+                    $("#csvform").hide();
                 }).fail(function (xhr, ajaxOptions, responseJSON, thrownError) {
                     $(".loader-container").hide();
                     alert("Something went wrong.");
@@ -108,21 +109,27 @@
                 })
             })
         });
-        function getcsvdetails(filename,starting,count){
+        function getcsvdetails(filename,starting,count,dueamount,paidamoount,concessionamoount,scholarshipamount,refundamount){
             $(".loader-container").show();
-
             $.ajax({
                 url:'upload.php',
                 method:'POST',
-                data:{filename:filename,starting:starting,count:count},
+                data:{filename:filename,starting:starting,count:count,dueamount:dueamount,paidamoount:paidamoount,concessionamoount:concessionamoount,scholarshipamount:scholarshipamount,refundamount:refundamount},
             }).done(function(response, status, xhr){
                 let r = JSON.parse(response);
+                $(".totalcount").html("Count of records- "+r.starting);
+                $(".dueamoount").html("Sum of Due Amount- "+r.dueamount);
+                $(".paidamoount").html("Sum of paid Amount- "+r.paidamoount);
+                $(".concessionamoount").html("Sum of Concession- "+r.concessionamoount);
+                $(".scholarshipamount").html("Sum of Scholarship- "+r.scholarshipamount);
+                $(".refundamount").html("Sum of Refund- "+r.refundamount);
                 if(r.more == 1){
-                    getcsvdetails(filename,r.starting,count)
+                    getcsvdetails(filename,r.starting,count,r.dueamount,r.paidamoount,r.concessionamoount,r.scholarshipamount,r.refundamount);
                 }
                 else{
                     $(".loader-container").hide();
                 }
+                $(".datashow").show();
             }).fail(function (xhr, ajaxOptions, responseJSON, thrownError) {
                 $(".loader-container").hide();
                 alert("Something went wrong.");

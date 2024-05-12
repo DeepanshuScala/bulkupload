@@ -1,31 +1,57 @@
 <?php
 include_once('dbcon.php');
+$s = "SELECT DISTINCT Department FROM temp_csv_data";
+$r = mysqli_query($conn, $s);
+//$row = $r->fetch_all();
+while($row = $r->fetch_assoc()){
+    echo "<pre>";
+    print_r($row);
+}
+/*
 $fileName = $_POST['filename'];
-$startRow = $_POST['starting']; // Rows before this index will be skipped
+$startRow = $_POST['starting'];
+$dueamount = (int)$_POST['dueamount'];
+$paidamoount = (int)$_POST['paidamoount'];
+$concessionamoount = (int)$_POST['concessionamoount'];
+$scholarshipamount = (int)$_POST['scholarshipamount'];
+$refundamount = (int)$_POST['refundamount'];
 $batchSize = 0; 
 $batchData=[];
 
 $file = fopen('temp/'.$fileName, 'r');
 
 for($i = 0; $i < $startRow && (fgets($file) !== false); $i++);
-while (($line = fgetcsv($file,0, ",")) !== FALSE) {
+while (($line = fgetcsv($file,1000, ",")) !== FALSE) {
+    
+    $remainingValues = array_slice($line, 1);
+    $batchData[$batchSize] = $remainingValues;
+    // echo "<pre>";
+    // print_r($batchData);
+    $dueamount += (int)$batchData[$batchSize][16];
+    $paidamoount += (int)$batchData[$batchSize][17];
+    $concessionamoount += (int)$batchData[$batchSize][18];
+    $scholarshipamount += (int)$batchData[$batchSize][19];
+    $refundamount += (int)$batchData[$batchSize][23];
+
+    insertBatch($conn, $batchData[$batchSize]);
     $batchSize++;
     $startRow++;
-    $remainingValues = array_slice($line, 1);
-    $batchData[] = $remainingValues;
-    
-    insertBatch($conn, $batchData);
-    if($batchSize == 20000){
+    if($batchSize == 10000){
         break;
     }
 }
 if($_POST['count']>$startRow){
-    echo json_encode(['status'=>200,'more'=>1,'filename'=>$fileName,'starting'=>$startRow,'count'=>$_POST['count']]); 
+    echo json_encode(['status'=>200,'more'=>1,'filename'=>$fileName,
+        'starting'=>$startRow,'count'=>$_POST['count'],'dueamount'=>$dueamount,
+        'paidamoount'=>$paidamoount,'concessionamoount'=>$concessionamoount,
+        'scholarshipamount'=>$scholarshipamount,'refundamount'=>$refundamount]); 
 }
 else{
-    echo json_encode(['status'=>200,'message'=>'Done uploading']); 
+    echo json_encode(['status'=>200,'message'=>'Done uploading','starting'=>$startRow,'dueamount'=>$dueamount,
+        'paidamoount'=>$paidamoount,'concessionamoount'=>$concessionamoount,
+        'scholarshipamount'=>$scholarshipamount,'refundamount'=>$refundamount]); 
 }
-
+*/
 // if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile'])) {
     
 //     // Open and read the CSV file
@@ -73,7 +99,7 @@ function insertBatch($conn, $batchData) {
         return;
     }
 
-    $placeholders = implode(", ",array_map(function($value) {return '"' . $value . '"';}, $batchData[0]));
+    $placeholders = implode(", ",array_map(function($value) {return "'" . preg_replace('/[\'"]/','', $value) . "'";}, $batchData));
     //print_r($placeholders);
     $sql = "INSERT INTO temp_csv_data (`Date`, `AcademicYear`, `Session`, `AllotedCategory`, `VoucherType`, `VoucherNo`, `RollNo`, `Admno/UniqueId`, `Status`, `FeeCategory`, `Faculty`, `Program`, `Department`, `Batch`, `ReceiptNo`, `FeeHead`, `DueAmount`, `PaidAmount`, `ConcessionAmount`, `ScholarshipAmount`, `ReverseConcessionAmount`, `WriteOffAmount`, `AdjustedAmount`, `RefundAmount`, `FundTranCferAmount`, `Remarks`) 
             VALUES ($placeholders)";
