@@ -66,6 +66,12 @@
                             <p class="concessionamoount"></p>
                             <p class="scholarshipamount"></p>
                             <p class="refundamount"></p>
+                            <br>
+                            <br>
+                            <p class="step1" style="display:none;">Branch Uploaded</p>
+                            <p class="step2" style="display:none;">Fee Category and Fee Collection Type Uploaded</p>
+                            <p class="step3" style="display:none;">Fee Type Uploaded</p>
+                            <p class="step4" style="display:none;">Transactions uploaded</p>
                         </div>
                     </div>
                 </div>
@@ -127,9 +133,65 @@
                     getcsvdetails(filename,r.starting,count,r.dueamount,r.paidamoount,r.concessionamoount,r.scholarshipamount,r.refundamount);
                 }
                 else{
-                    $(".loader-container").hide();
+                    $.ajax({
+                        url:'datadistribution.php',
+                        method:'POST',
+                        data:{case:1},
+                    }).done(function (response, status, xhr) {
+                        $(".step1").show();
+                        $.ajax({
+                            url:'datadistribution.php',
+                            method:'POST',
+                            data:{case:2},
+                        }).done(function (response, status, xhr) {
+                            $(".step2").show();
+                            $.ajax({
+                                url:'datadistribution.php',
+                                method:'POST',
+                                data:{case:3},
+                            }).done(function (response, status, xhr) {
+                                $(".step3").show();
+                                finaldistribution(1,count);
+                            }).fail(function (xhr, ajaxOptions, responseJSON, thrownError) {
+                                $(".loader-container").hide();
+                                alert("Something went wrong.");
+                                window.reload();
+                            })
+                        }).fail(function (xhr, ajaxOptions, responseJSON, thrownError) {
+                            $(".loader-container").hide();
+                            alert("Something went wrong.");
+                            window.reload();
+                        })
+                    }).fail(function (xhr, ajaxOptions, responseJSON, thrownError) {
+                        $(".loader-container").hide();
+                        alert("Something went wrong.");
+                        window.reload();
+                    })
                 }
                 $(".datashow").show();
+            }).fail(function (xhr, ajaxOptions, responseJSON, thrownError) {
+                $(".loader-container").hide();
+                alert("Something went wrong.");
+                window.reload();
+            })
+        }
+
+        function finaldistribution(offset,count){
+            $.ajax({
+                url:'datadistribution.php',
+                method:'POST',
+                data:{offset:offset,count:count,case:4},
+            }).done(function (response, status, xhr) {
+                let r = JSON.parse(response);
+                if(r.more == 1){
+                    finaldistribution(r.offset,count);
+                }
+                else{
+                    $(".step4").show();
+                    $(".loader-container").hide();
+                }
+                
+                $("#csvform").hide();
             }).fail(function (xhr, ajaxOptions, responseJSON, thrownError) {
                 $(".loader-container").hide();
                 alert("Something went wrong.");
