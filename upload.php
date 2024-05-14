@@ -1,13 +1,13 @@
 <?php
 include_once('dbcon.php');
-$s = "SELECT DISTINCT Department FROM temp_csv_data";
-$r = mysqli_query($conn, $s);
-//$row = $r->fetch_all();
-while($row = $r->fetch_assoc()){
-    echo "<pre>";
-    print_r($row);
-}
-/*
+// $s = "SELECT DISTINCT Department FROM temp_csv_data";
+// $r = mysqli_query($conn, $s);
+// //$row = $r->fetch_all();
+// while($row = $r->fetch_assoc()){
+//     echo "<pre>";
+//     print_r($row);
+// }
+
 $fileName = $_POST['filename'];
 $startRow = $_POST['starting'];
 $dueamount = (int)$_POST['dueamount'];
@@ -51,7 +51,7 @@ else{
         'paidamoount'=>$paidamoount,'concessionamoount'=>$concessionamoount,
         'scholarshipamount'=>$scholarshipamount,'refundamount'=>$refundamount]); 
 }
-*/
+
 // if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csvFile'])) {
     
 //     // Open and read the CSV file
