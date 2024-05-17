@@ -7,7 +7,6 @@ include_once('dbcon.php');
 //     echo "<pre>";
 //     print_r($row);
 // }
-
 $fileName = $_POST['filename'];
 $startRow = $_POST['starting'];
 $dueamount = (int)$_POST['dueamount'];
@@ -32,7 +31,8 @@ while (($line = fgetcsv($file,1000, ",")) !== FALSE) {
     $concessionamoount += (int)$batchData[$batchSize][18];
     $scholarshipamount += (int)$batchData[$batchSize][19];
     $refundamount += (int)$batchData[$batchSize][23];
-
+    // echo "<pre>";
+    // print_r($batchData[$batchSize]);
     insertBatch($conn, $batchData[$batchSize]);
     $batchSize++;
     $startRow++;

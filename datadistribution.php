@@ -3,7 +3,6 @@ ini_set('display_errors', 0);
 include_once('dbcon.php');
 $getbranchesq = mysqli_query($conn,"SELECT * FROM branches");
 $getbranches = $getbranchesq->fetch_all();
-
 switch($_POST['case']){
     case 1:
         $s = "SELECT DISTINCT Department FROM temp_csv_data";
@@ -152,7 +151,9 @@ switch($_POST['case']){
             }
             $offset++;
         }
-        if($_POST['count']>$offset){
+        $s1= mysqli_query($conn,"SELECT count(*) as total FROM temp_csv_data");
+        $allcount = $s1->fetch_all();
+        if($allcount[0][0] > $offset){
             echo json_encode(['status'=>200,'more'=>1,'offset'=>$offset]); 
         }
         else{
